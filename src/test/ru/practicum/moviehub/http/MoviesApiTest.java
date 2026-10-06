@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MoviesApiTest {
 
-    private static final String BASE = "http://localhost:8080"; // !!! добавьте базовую часть URL
+    private static final String BASE = "http://localhost:8080";
     private static MoviesServer server;
     private static HttpClient client;
     private static MoviesStore store;
@@ -402,6 +402,6 @@ public class MoviesApiTest {
         assertEquals("application/json; charset=UTF-8", contentTypeHeaderValue);
 
         String body = resp.body().trim();
-        assertEquals("\"Некорректный параметр запроса — \\u0027year\\u0027\"", body);
+        assertEquals("\"Некорректный параметр запроса — year\"", body);
     }
 }

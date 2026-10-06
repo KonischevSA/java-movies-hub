@@ -121,7 +121,7 @@ public class MoviesHandler extends BaseHttpHandler {
             jsonResp = gson.toJson(store.getMoviesByYear(year));
             sendJson(ex, 200, jsonResp);
         } catch (Exception e) {
-            jsonResp = gson.toJson("Некорректный параметр запроса — 'year'");
+            jsonResp = gson.toJson("Некорректный параметр запроса — year");
             sendJson(ex, 400, jsonResp);
         }
     }

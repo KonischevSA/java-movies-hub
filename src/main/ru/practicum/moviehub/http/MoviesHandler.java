@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
-import ru.practicum.moviehub.api.ErrorResponse;
 import ru.practicum.moviehub.model.Movie;
 import ru.practicum.moviehub.store.MoviesStore;
 
@@ -33,7 +32,7 @@ public class MoviesHandler extends BaseHttpHandler {
             case GET_MOVIES_YEAR -> handleGetMoviesByYear(ex);
             case POST_MOVIES -> handlePostMovies(ex);
             case DELETE_MOVIES_ID -> handleDeleteMoviesById(ex);
-            case UNKNOWN -> sendJson(ex, 404, "Такого эндпоинта не существует");
+            case UNKNOWN -> sendError(ex, 405, null, null);
         }
     }
 
@@ -92,7 +91,6 @@ public class MoviesHandler extends BaseHttpHandler {
 
     private void handleGetMoviesById(HttpExchange ex) throws IOException {
         Gson gson = new Gson();
-        String jsonResp;
         int id;
 
         try {
@@ -100,29 +98,23 @@ public class MoviesHandler extends BaseHttpHandler {
             Movie movie = store.getMovieById(id);
 
             if (movie != null) {
-                jsonResp = gson.toJson(movie);
-                sendJson(ex, 200, jsonResp);
+                sendJson(ex, 200, gson.toJson(movie));
             } else {
-                jsonResp = gson.toJson("Фильм не найден");
-                sendJson(ex, 404, jsonResp);
+                sendError(ex, 404, "Фильм не найден", null);
             }
         } catch (Exception e) {
-            jsonResp = gson.toJson("Некорректный ID");
-            sendJson(ex, 400, jsonResp);
+            sendError(ex, 400, "Некорректный ID", null);
         }
     }
 
     private void handleGetMoviesByYear(HttpExchange ex) throws IOException {
         Gson gson = new Gson();
-        String jsonResp;
 
         try {
             int year = Integer.parseInt(getParmValue(ex.getRequestURI().getQuery(), "year"));
-            jsonResp = gson.toJson(store.getMoviesByYear(year));
-            sendJson(ex, 200, jsonResp);
+            sendJson(ex, 200, gson.toJson(store.getMoviesByYear(year)));
         } catch (Exception e) {
-            jsonResp = gson.toJson("Некорректный параметр запроса — year");
-            sendJson(ex, 400, jsonResp);
+            sendError(ex, 400, "Некорректный параметр запроса — year", null);
         }
     }
 
@@ -130,12 +122,11 @@ public class MoviesHandler extends BaseHttpHandler {
         List<String> contentTypeValues = ex.getRequestHeaders().get("Content-type");
 
         if (contentTypeValues == null || !contentTypeValues.contains("application/json")) {
-            sendNoContent(ex, 415);
+            sendError(ex, 415, null, null);
             return;
         }
 
         Gson gson = new Gson();
-        String jsonResp;
 
         String body = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonElement jsonElement = JsonParser.parseString(body);
@@ -179,18 +170,15 @@ public class MoviesHandler extends BaseHttpHandler {
                 Movie movie = new Movie(title, year);
                 store.addMovie(movie);
 
-                jsonResp = gson.toJson(movie);
-                sendJson(ex, 201, jsonResp);
+                sendJson(ex, 201, gson.toJson(movie));
             } else {
-                jsonResp = gson.toJson(new ErrorResponse("Ошибка валидации", errors));
-                sendJson(ex, 422, jsonResp);
+                sendError(ex, 422, "Ошибка валидации", errors);
             }
         }
     }
 
     private void handleDeleteMoviesById(HttpExchange ex) throws IOException {
         Gson gson = new Gson();
-        String jsonResp;
         int id;
 
         try {
@@ -199,14 +187,12 @@ public class MoviesHandler extends BaseHttpHandler {
 
             if (movie != null) {
                 store.removeMovieById(id);
-                sendNoContent(ex, 204);
+                sendJson(ex, 204, null);
             } else {
-                jsonResp = gson.toJson("Фильм не найден");
-                sendJson(ex, 404, jsonResp);
+                sendError(ex, 404, "Фильм не найден", null);
             }
         } catch (Exception e) {
-            jsonResp = gson.toJson("Некорректный ID");
-            sendJson(ex, 400, jsonResp);
+            sendError(ex, 400, "Некорректный ID", null);
         }
     }
 }

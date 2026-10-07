@@ -249,7 +249,7 @@ public class MoviesApiTest {
         assertEquals("application/json; charset=UTF-8", contentTypeHeaderValue);
 
         String body = resp.body().trim();
-        assertEquals("\"Фильм не найден\"", body);
+        assertEquals("{\"error\":\"Фильм не найден\"}", body);
     }
 
     @Test
@@ -271,7 +271,7 @@ public class MoviesApiTest {
         assertEquals("application/json; charset=UTF-8", contentTypeHeaderValue);
 
         String body = resp.body().trim();
-        assertEquals("\"Некорректный ID\"", body);
+        assertEquals("{\"error\":\"Некорректный ID\"}", body);
     }
 
     @Test
@@ -308,7 +308,7 @@ public class MoviesApiTest {
         assertEquals("application/json; charset=UTF-8", contentTypeHeaderValue);
 
         String body = resp.body().trim();
-        assertEquals("\"Фильм не найден\"", body);
+        assertEquals("{\"error\":\"Фильм не найден\"}", body);
     }
 
     @Test
@@ -330,7 +330,7 @@ public class MoviesApiTest {
         assertEquals("application/json; charset=UTF-8", contentTypeHeaderValue);
 
         String body = resp.body().trim();
-        assertEquals("\"Некорректный ID\"", body);
+        assertEquals("{\"error\":\"Некорректный ID\"}", body);
     }
 
     @Test
@@ -382,7 +382,7 @@ public class MoviesApiTest {
     }
 
     @Test
-    void getMoviesByYear_whenYearNotNumber_returnsEmptyArray() throws Exception {
+    void getMoviesByYear_whenYearNotNumber_returnsValidationError() throws Exception {
         store.addMovie(new Movie("Первый", 1900));
         store.addMovie(new Movie("Второй", 1900));
         store.addMovie(new Movie("Третий", 1910));
@@ -402,6 +402,6 @@ public class MoviesApiTest {
         assertEquals("application/json; charset=UTF-8", contentTypeHeaderValue);
 
         String body = resp.body().trim();
-        assertEquals("\"Некорректный параметр запроса — year\"", body);
+        assertEquals("{\"error\":\"Некорректный параметр запроса — year\"}", body);
     }
 }
